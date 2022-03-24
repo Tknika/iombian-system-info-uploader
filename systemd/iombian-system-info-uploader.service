@@ -1,0 +1,16 @@
+[Unit]
+Description=IoMBian System Info Uploader
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+Type=simple
+User=iompi
+Restart=always
+RestartSec=5
+
+WorkingDirectory=/opt/iombian-system-info-uploader
+ExecStart=/opt/iombian-system-info-uploader/venv/bin/python /opt/iombian-system-info-uploader/main.py
+
+[Install]
+WantedBy=multi-user.target
