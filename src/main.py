@@ -13,11 +13,18 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def signal_handler(sig, frame):
+def stop():
     logger.info("Stopping IoMBian Services Uploader Service")
-    comm_module.stop()
-    firestore_system_info_handler.stop()
-    system_info_client.stop()
+    if firestore_system_info_handler:
+        firestore_system_info_handler.stop()
+    if system_info_client:
+        system_info_client.stop()
+    if comm_module:
+        comm_module.stop()
+
+
+def signal_handler(sig, frame):
+    stop()
 
 
 def on_db_system_info_updated(system_info):
@@ -44,6 +51,8 @@ def filter_message(message):
 if __name__ == "__main__":
     logger.info("Starting IoMBian System Info Uploader Service")
 
+    comm_module, firestore_system_info_handler, system_info_client = None, None, None
+
     comm_module = CommunicationModule(host="127.0.0.1", port=5555)
     comm_module.start()
 
@@ -55,9 +64,7 @@ if __name__ == "__main__":
 
     firestore_system_info_cache = None
     firestore_system_info_handler = FirestoreSystemInfoHandler(
-        api_key, project_id, refresh_token, device_id)
-    firestore_system_info_handler.add_system_info_update_callback(
-        on_db_system_info_updated)
+        api_key, project_id, refresh_token, device_id, on_db_system_info_updated)
     firestore_system_info_handler.start()
 
     while(firestore_system_info_cache == None):
