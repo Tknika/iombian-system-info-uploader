@@ -10,25 +10,29 @@ This service listens to the information provided by [IoMBian System Info Provide
 
 ## Installation
 
+- Define project name in an environment variable:
+
+> ```PROJECT_NAME=iombian-system-info-uploader```
+
 - Clone the repo into a temp folder:
 
-> ```git clone https://github.com/Tknika/iombian-system-info-uploader.git /tmp/iombian-system-info-uploader && cd /tmp/iombian-system-info-uploader```
+> ```git clone https://github.com/Tknika/${PROJECT_NAME}.git /tmp/${PROJECT_NAME} && cd /tmp/${PROJECT_NAME}```
 
 - Create the installation folder and move the appropiate files (edit the user):
 
-> ```sudo mkdir /opt/iombian-system-info-uploader```
+> ```sudo mkdir /opt/${PROJECT_NAME}```
 
-> ```sudo cp requirements.txt /opt/iombian-system-info-uploader```
+> ```sudo cp requirements.txt /opt/${PROJECT_NAME}```
 
-> ```sudo cp -r src/* /opt/iombian-system-info-uploader```
+> ```sudo cp -r src/* /opt/${PROJECT_NAME}```
 
-> ```sudo cp systemd/iombian-system-info-uploader.service /etc/systemd/system/```
+> ```sudo cp systemd/${PROJECT_NAME}.service /etc/systemd/system/```
 
-> ```sudo chown -R iompi:iompi /opt/iombian-system-info-uploader```
+> ```sudo chown -R iompi:iompi /opt/${PROJECT_NAME}```
 
 - Create the virtual environment and install the dependencies:
 
-> ```cd /opt/iombian-system-info-uploader```
+> ```cd /opt/${PROJECT_NAME}```
 
 > ```python3 -m venv venv```
 
@@ -40,7 +44,7 @@ This service listens to the information provided by [IoMBian System Info Provide
 
 - Start the script
 
-> ```sudo systemctl enable iombian-system-info-uploader.service && sudo systemctl start iombian-system-info-uploader.service```
+> ```sudo systemctl enable ${PROJECT_NAME}.service && sudo systemctl start ${PROJECT_NAME}.service```
 
 
 ## Author
