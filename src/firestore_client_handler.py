@@ -8,18 +8,19 @@ import json
 import logging
 import requests
 import threading
+import time
 
 logger = logging.getLogger(__name__)
 
-watch._should_recover = lambda x: False
-watch._should_terminate = lambda x: True
+watch._should_recover = lambda _: False
+watch._should_terminate = lambda _: True
 
 
 class FirestoreClientHandler:
 
     REFRESH_TOKEN_TIME_MIN = 58
     INITIALIZATION_RETRY_TIME_MIN = 1
-    SERVER_RESPONSE_TIMEOUT_S = 60
+    SERVER_RESPONSE_TIMEOUT_S = 90
 
     def __init__(self, api_key, project_id, refresh_token):
         self.api_key = api_key
@@ -68,6 +69,7 @@ class FirestoreClientHandler:
         self.client = None
         if self.server_responde_message_handler:
             self.server_responde_message_handler.stop()
+            self.server_responde_message_handler = None
         if self.initialization_retry_timer:
             self.initialization_retry_timer.cancel()
             self.initialization_retry_timer.join()
@@ -135,6 +137,7 @@ class ServerResponseMessageHandler(logging.StreamHandler):
         self.timeout_s = timeout_s
         self.on_server_not_responding = on_server_not_responding
         self.server_response_msg = server_response_msg
+        self.server_response_last_time = time.time()
         self.watchdog_timeout_msg = watchdog_timeout_msg
         self.not_responding_timer = None
         self.setFormatter(logging.Formatter(
@@ -146,7 +149,9 @@ class ServerResponseMessageHandler(logging.StreamHandler):
             logger.debug("Server connection timeout detected")
             threading.Thread(target=self.on_server_not_responding).start()
         if self.server_response_msg in msg:
-            logger.debug("Server response message caught")
+            logger.debug("Server response message caught ({} seconds)".format(
+                time.time() - self.server_response_last_time))
+            self.server_response_last_time = time.time()
             if self.not_responding_timer:
                 self.stop()
             self.not_responding_timer = threading.Timer(
